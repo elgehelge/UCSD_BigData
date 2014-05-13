@@ -31,7 +31,7 @@ entry=Creds[ID]
 print 'Using the 0 elements from \n',entry
 key_id=entry['Creds'][0]['Access_Key_Id']
 secret_key=entry['Creds'][0]['Secret_Access_Key']
-# password=entry['Passwords'][0]
+password='NOTHING'#entry['Passwords'][0]
 
 security_group=raw_input('What security group do you want to use? ')
 security_groups=[security_group]

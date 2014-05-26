@@ -139,11 +139,11 @@ def create_image(image_name):
     Send_Command(delete_Vault,emptyCallBack)
     instance.create_image(args['create_image'])
 
-def Send_Command(command,callback,dont_wait=False):
+def Send_Command(command,callback,dont_wait=True):
     init=time.time()
     
-    print 'SendCommand:',' '.join(ssh+command)
-    ssh_process = subprocess.Popen(ssh+command,
+    # print 'SendCommand:',ssh+command
+    ssh_process = subprocess.Popen([r'C:\Program Files (x86)\Git\bin\bash.exe', "-c", ssh+command],
                                    shell=False,
                                    stdin=subprocess.PIPE,
                                    stdout=subprocess.PIPE,
@@ -154,16 +154,16 @@ def Send_Command(command,callback,dont_wait=False):
 
     endReached=False
     while not endReached:
-        if dataWaiting(ssh_process.stdout):
-            line=ssh_process.stdout.readline()
-            if len(line)>0:
-                print line,
-                
-                endReached = endReached | callback(line)
+        #if dataWaiting(ssh_process.stdout):
+        line=ssh_process.stdout.readline()
+        if len(line)>0:
+            print line,
 
-                matchEnd=re.match('=== END ===',line)
-                if matchEnd:
-                    endReached=True
+            endReached = endReached | callback(line)
+
+            matchEnd=re.match('=== END ===',line)
+            if matchEnd:
+                endReached=True
         if dont_wait: endReached=True
         time.sleep(0.01)
 
@@ -199,7 +199,7 @@ if __name__ == "__main__":
                         help='Create an AMI from the current state of the (first) instance')
     parser.add_argument('-p','--password',
                         help='Specify password for notebook (if missing=use existing password)')
-    parser.add_argument('-t','--instance_type',default='c1.medium',#'t1.micro',
+    parser.add_argument('-t','--instance_type',default='m3.xlarge',#'t1.micro',
                         help='Type of instance to launch, Common choices are t1.micro,c1.medium,m3.xlarge, for more info see: https://aws.amazon.com//ec2/instance-types/')
 #Some common choices:
 #              vCPU     ECU	Memory (GiB)	Instance Storage (GB)	Linux/UNIX Usage
@@ -217,7 +217,7 @@ if __name__ == "__main__":
 
     args = vars(parser.parse_args())
 
-    # print 'args=',args
+    print 'args=',args
 
     # open connection to aws
     print 'The regions you are connected to are:',boto.ec2.regions()
